@@ -71,6 +71,77 @@ function createLogger(): Required<TIDBLogger> {
 }
 
 describe('TheIntroDB package', () => {
+  describe('baseUrl sanitization', () => {
+    it('converts http to https in baseUrl', async () => {
+      const fetchMock = createFetchMock(
+        createResponse({
+          body: {
+            tmdb_id: 12345,
+            type: 'movie',
+            intro: [],
+            credits: [],
+          },
+        })
+      );
+
+      await getMedia(
+        { tmdbId: 12345 },
+        { fetch: fetchMock, baseUrl: 'http://api.theintrodb.org/v2' }
+      );
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.theintrodb.org/v2/media?tmdb_id=12345',
+        expect.any(Object)
+      );
+    });
+
+    it('prepends https if no protocol is given in baseUrl', async () => {
+      const fetchMock = createFetchMock(
+        createResponse({
+          body: {
+            tmdb_id: 12345,
+            type: 'movie',
+            intro: [],
+            credits: [],
+          },
+        })
+      );
+
+      await getMedia(
+        { tmdbId: 12345 },
+        { fetch: fetchMock, baseUrl: 'api.theintrodb.org/v2' }
+      );
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.theintrodb.org/v2/media?tmdb_id=12345',
+        expect.any(Object)
+      );
+    });
+
+    it('strips trailing slashes from baseUrl', async () => {
+      const fetchMock = createFetchMock(
+        createResponse({
+          body: {
+            tmdb_id: 12345,
+            type: 'movie',
+            intro: [],
+            credits: [],
+          },
+        })
+      );
+
+      await getMedia(
+        { tmdbId: 12345 },
+        { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v2/' }
+      );
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.theintrodb.org/v2/media?tmdb_id=12345',
+        expect.any(Object)
+      );
+    });
+  });
+
   it('normalizes null timestamps from media responses', async () => {
     const fetchMock = createFetchMock(
       createResponse({

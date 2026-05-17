@@ -1,6 +1,6 @@
 title: TheIntroDB Package Docs
 description: Documentation for the theintrodb NPM package
 plugins:
-- jekyll-remote-theme
+  - jekyll-remote-theme
 remote_theme: pages-themes/hacker@v0.2.0
 markdown: kramdown

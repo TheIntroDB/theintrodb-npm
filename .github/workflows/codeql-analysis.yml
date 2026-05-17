@@ -1,4 +1,4 @@
-name: "Codecove"
+name: 'Codecove'
 
 permissions:
   security-events: write
@@ -12,7 +12,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [main]
   schedule:
-    - cron: "36 7 * * 6"
+    - cron: '36 7 * * 6'
 
 jobs:
   coverage:

@@ -653,7 +653,15 @@ function getGlobalFetch(): FetchLike {
 }
 
 function sanitizeBaseUrl(baseUrl: string): string {
-  return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  let sanitized = baseUrl;
+
+  if (sanitized.startsWith('http://')) {
+    sanitized = sanitized.replace('http://', 'https://');
+  } else if (!sanitized.startsWith('https://')) {
+    sanitized = `https://${sanitized}`;
+  }
+
+  return sanitized.endsWith('/') ? sanitized.slice(0, -1) : sanitized;
 }
 
 function toMilliseconds(

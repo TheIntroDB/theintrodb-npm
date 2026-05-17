@@ -113,10 +113,7 @@ const result = await client.submitMediaTimestamp(
 ```ts
 import { getMedia, submitMediaTimestamp } from 'theintrodb';
 
-const media = await getMedia(
-  { tmdbId: 12345 },
-  { logger: console }
-);
+const media = await getMedia({ tmdbId: 12345 }, { logger: console });
 
 await submitMediaTimestamp(
   {
