@@ -30,13 +30,6 @@ const DEFAULT_BASE_URL = 'https://api.theintrodb.org/v2';
 const MAX_TMDB_ID = 10_000_000;
 const MAX_TIMESTAMP_SECONDS = 21_600;
 const MAX_TIMESTAMP_MS = 21_600_000;
-const MIN_DURATION_MS = 5_000;
-const MAX_SEGMENT_DURATIONS_MS: Record<SegmentType, number> = {
-  intro: 200_000,
-  recap: 1_200_000,
-  credits: 1_800_000,
-  preview: 1_800_000,
-};
 const IMDB_ID_PATTERN = /^tt[0-9]{7,8}$/;
 const EPISODE_SELECTION_PATTERN = /^[1-9]\d*(,\s*[1-9]\d*)*$/;
 
@@ -687,86 +680,15 @@ function validateSubmissionTiming(
         message: `\`${segment}\` submissions require an end time.`,
         path: ['endMs'],
       });
-      return;
     }
-
-    const effectiveStart = startMs ?? 0;
-    const duration = endMs - effectiveStart;
-
-    if (duration < 0) {
+  } else {
+    if (startMs == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'End time must be greater than or equal to the start time.',
-        path: ['endMs'],
-      });
-      return;
-    }
-
-    if (duration !== 0 && duration < MIN_DURATION_MS) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `\`${segment}\` duration must be 0 or at least ${MIN_DURATION_MS} ms.`,
-        path: ['endMs'],
+        message: `\`${segment}\` submissions require a start time.`,
+        path: ['startMs'],
       });
     }
-
-    if (duration > MAX_SEGMENT_DURATIONS_MS[segment]) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `\`${segment}\` duration cannot exceed ${MAX_SEGMENT_DURATIONS_MS[segment]} ms.`,
-        path: ['endMs'],
-      });
-    }
-
-    return;
-  }
-
-  if (startMs == null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `\`${segment}\` submissions require a start time.`,
-      path: ['startMs'],
-    });
-    return;
-  }
-
-  if (segment === 'credits' && startMs !== 0 && startMs < MIN_DURATION_MS) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: '`credits` start time must be 0 or at least 5000 ms.',
-      path: ['startMs'],
-    });
-  }
-
-  if (endMs == null) {
-    return;
-  }
-
-  const duration = endMs - startMs;
-
-  if (duration < 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'End time must be greater than or equal to the start time.',
-      path: ['endMs'],
-    });
-    return;
-  }
-
-  if (duration !== 0 && duration < MIN_DURATION_MS) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `\`${segment}\` duration must be 0 or at least ${MIN_DURATION_MS} ms.`,
-      path: ['endMs'],
-    });
-  }
-
-  if (duration > MAX_SEGMENT_DURATIONS_MS[segment]) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `\`${segment}\` duration cannot exceed ${MAX_SEGMENT_DURATIONS_MS[segment]} ms.`,
-      path: ['endMs'],
-    });
   }
 }
 
