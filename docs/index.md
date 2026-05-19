@@ -34,6 +34,7 @@ const client = createIntroDbClient({
 
 const movie = await client.getMedia({
   tmdbId: 12345,
+  durationMs: 7_200_000,
 });
 
 const episode = await client.getMedia({
@@ -52,6 +53,7 @@ await client.submitMediaTimestamp(
     tmdbId: 12345,
     type: 'movie',
     segment: 'intro',
+    videoDurationMs: 7_200_000,
     startSec: 0,
     endSec: 90,
   },

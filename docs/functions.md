@@ -48,6 +48,7 @@ getMedia(
 - `imdbId`: Optional fallback identifier
 - `season`: Required with `episode` for TV episode lookups
 - `episode`: Required with `season` for TV episode lookups
+- `durationMs`: Optional total video duration in milliseconds used by the API to select the closest matching release version (theatrical, extended cut, etc.)
 
 ### Returns
 
@@ -97,6 +98,7 @@ submitMediaTimestamp(
 - `credits` and `preview` allow `null` ends
 - TV submissions require `season` and `episode`
 - Movie submissions must omit `season` and `episode`
+- `videoDurationMs` is optional but highly recommended; it helps associate the submission with a release version for matching
 
 ## buildMediaQuery(params)
 
@@ -129,6 +131,7 @@ serializeSubmissionRequest(
 
 - `intro` and `recap` starts of `0` or `null` become `start_ms: null`
 - `credits` and `preview` null ends stay `end_ms: null`
+- `videoDurationMs` is sent as `video_duration_ms` when provided
 - seconds are rounded to milliseconds
 - The outgoing API payload always uses millisecond field names: `start_ms` and `end_ms`
 

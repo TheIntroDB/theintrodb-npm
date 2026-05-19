@@ -128,12 +128,14 @@ Fields:
 - `imdbId?`
 - `season?`
 - `episode?`
+- `durationMs?`
 
 Notes:
 
 - provide `tmdbId` for movies
 - provide `tmdbId`, `season`, and `episode` for TV episodes
 - `imdbId` is supported when TMDB is not available
+- `durationMs` is optional but very highly recommended; it helps the API select the closest matching release version (theatrical, extended cut, DVD release, etc.)
 
 ### SubmitMediaBase
 
@@ -148,6 +150,7 @@ Fields:
 - `segment`
 - `season?`
 - `episode?`
+- `videoDurationMs?`
 
 ### SubmitMediaSecondsInput
 
@@ -187,6 +190,7 @@ Fields:
 - `segment`
 - `season?`
 - `episode?`
+- `video_duration_ms?`
 - `start_ms?`
 - `end_ms?`
 
@@ -273,6 +277,7 @@ Notes:
 - uses camelCase field names from the backend response: `startMs` and `endMs`
 - `startMs: null` can appear for intro/recap submissions that begin at the start
 - `endMs: null` can appear for credits/preview submissions that go to the end
+- `videoDurationMs` is included as `null` when the backend does not associate the submission with a specific release version
 
 ### SubmissionData
 
@@ -286,6 +291,7 @@ Fields:
 - `segment`
 - `season?`
 - `episode?`
+- `videoDurationMs`
 - `startMs`
 - `endMs`
 - `durationMs`
@@ -304,9 +310,17 @@ Notes:
 
 Raw success response from `/submit`.
 
+Fields:
+
+- `submissions`
+
 ### SubmissionResponse
 
 Normalized success response returned by the package.
+
+Fields:
+
+- `submissions`
 
 ## Utility Types
 

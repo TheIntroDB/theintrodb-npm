@@ -18,7 +18,10 @@ Common cases:
 
 - missing `tmdbId` and `imdbId` for `getMedia()`
 - missing `season` or `episode` for TV requests
+- invalid `durationMs` for `getMedia()` (must be a non-negative integer number of milliseconds)
 - mixed seconds and milliseconds in one submission
+- invalid `videoDurationMs` for submissions (must be `0` or at least 5 minutes, and no more than 6 hours)
+- using `videoDurationMs` with TV season/episode expressions (lists/ranges) instead of a single episode
 - missing current-user API key for `submitMediaTimestamp()`
 
 ### TheIntroDbResponseValidationError

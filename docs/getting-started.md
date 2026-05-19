@@ -36,7 +36,7 @@ const client = createIntroDbClient({
 
 ### Client Options
 
-- `baseUrl`: Override the API base URL. Defaults to `https://api.theintrodb.org/v2`.
+- `baseUrl`: Override the API base URL. Defaults to `https://api.theintrodb.org/v3`.
 - `apiKey`: Optional current-user API key. Useful if you want a client instance that always acts on behalf of one user.
 - `headers`: Additional headers merged into each request.
 - `fetch`: Custom fetch implementation for tests, Node runtimes, or other environments.
@@ -49,6 +49,7 @@ const client = createIntroDbClient({
 ```ts
 const movie = await client.getMedia({
   tmdbId: 12345,
+  durationMs: 7_200_000,
 });
 ```
 
@@ -82,11 +83,12 @@ const media = await client.getMedia(
 `submitMediaTimestamp()` always requires the current user's API key.
 
 ```ts
-const result = await client.submitMediaTimestamp(
+const submissionResult = await client.submitMediaTimestamp(
   {
     tmdbId: 12345,
     type: 'movie',
     segment: 'intro',
+    videoDurationMs: 7_200_000,
     startSec: 30.5,
     endSec: 90.2,
   },
@@ -94,6 +96,8 @@ const result = await client.submitMediaTimestamp(
     apiKey: currentUserApiKey,
   }
 );
+
+const submissions = submissionResult.submissions;
 ```
 
 ## Time Format Rules

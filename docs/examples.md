@@ -20,6 +20,17 @@ const media = await client.getMedia({
 });
 ```
 
+## Public Movie Lookup With Video Duration
+
+Providing `durationMs` is optional but very highly recommended. It helps the API select the closest matching release version (theatrical, extended cut, etc.).
+
+```ts
+const media = await client.getMedia({
+  tmdbId: 12345,
+  durationMs: 7_200_000,
+});
+```
+
 ## Public TV Episode Lookup
 
 ```ts
@@ -58,11 +69,12 @@ This can include the current user's pending submissions in the weighted result.
 ## Intro Submission In Seconds
 
 ```ts
-const result = await client.submitMediaTimestamp(
+const submissionResult = await client.submitMediaTimestamp(
   {
     tmdbId: 12345,
     type: 'movie',
     segment: 'intro',
+    videoDurationMs: 7_200_000,
     startSec: 30,
     endSec: 90,
   },
@@ -70,35 +82,41 @@ const result = await client.submitMediaTimestamp(
     apiKey: currentUserApiKey,
   }
 );
+
+const submissions = submissionResult.submissions;
 ```
 
 ## Credits Submission In Seconds With Null End
 
 ```ts
-const result = await client.submitMediaTimestamp(
+const submissionResult = await client.submitMediaTimestamp(
   {
     tmdbId: 12345,
     type: 'tv',
     season: 1,
     episode: 1,
     segment: 'credits',
-    startSec: 5400,
+    videoDurationMs: 2_760_000,
+    startSec: 2400,
     endSec: null,
   },
   {
     apiKey: currentUserApiKey,
   }
 );
+
+const submissions = submissionResult.submissions;
 ```
 
 ## Intro Submission In Milliseconds
 
 ```ts
-const result = await client.submitMediaTimestamp(
+const submissionResult = await client.submitMediaTimestamp(
   {
     tmdbId: 12345,
     type: 'movie',
     segment: 'intro',
+    videoDurationMs: 7_200_000,
     startMs: 30000,
     endMs: 90000,
   },
@@ -106,6 +124,8 @@ const result = await client.submitMediaTimestamp(
     apiKey: currentUserApiKey,
   }
 );
+
+const submissions = submissionResult.submissions;
 ```
 
 ## Standalone Functions Instead Of A Client
@@ -113,13 +133,17 @@ const result = await client.submitMediaTimestamp(
 ```ts
 import { getMedia, submitMediaTimestamp } from 'theintrodb';
 
-const media = await getMedia({ tmdbId: 12345 }, { logger: console });
+const media = await getMedia(
+  { tmdbId: 12345, durationMs: 7_200_000 },
+  { logger: console }
+);
 
 await submitMediaTimestamp(
   {
     tmdbId: 12345,
     type: 'movie',
     segment: 'intro',
+    videoDurationMs: 7_200_000,
     startSec: 0,
     endSec: 90,
   },
