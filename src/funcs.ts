@@ -26,10 +26,11 @@ import {
   SubmitMediaTimestampInput,
 } from './types';
 
-const DEFAULT_BASE_URL = 'https://api.theintrodb.org/v2';
+const DEFAULT_BASE_URL = 'https://api.theintrodb.org/v3';
 const MAX_TMDB_ID = 10_000_000;
 const MAX_TIMESTAMP_SECONDS = 21_600;
 const MAX_TIMESTAMP_MS = 21_600_000;
+const MIN_VIDEO_DURATION_MS = 300_000;
 const IMDB_ID_PATTERN = /^tt[0-9]{7,8}$/;
 const EPISODE_SELECTION_PATTERN = /^[1-9]\d*(,\s*[1-9]\d*)*$/;
 
@@ -66,6 +67,7 @@ const submissionDataRawSchema = z.object({
   segment: segmentTypeSchema,
   season: z.number().int().min(1).nullable().optional(),
   episode: z.number().int().min(1).nullable().optional(),
+  videoDurationMs: z.number().int().min(0).max(MAX_TIMESTAMP_MS).nullable(),
   startMs: z.number().int().min(0).nullable().optional(),
   endMs: z.number().int().min(0).nullable().optional(),
   status: submissionStatusSchema,
@@ -73,8 +75,7 @@ const submissionDataRawSchema = z.object({
 });
 
 const submissionResponseRawSchema = z.object({
-  ok: z.literal(true),
-  submission: submissionDataRawSchema,
+  submissions: z.array(submissionDataRawSchema),
 });
 
 const errorResponseSchema = z.object({
@@ -90,7 +91,7 @@ const getMediaParamsSchema = z
     imdbId: z.string().regex(IMDB_ID_PATTERN).optional(),
     season: z.number().int().min(1).optional(),
     episode: z.number().int().min(1).optional(),
-    details: z.boolean().optional(),
+    durationMs: z.number().int().min(0).max(MAX_TIMESTAMP_MS).optional(),
   })
   .superRefine((value, ctx) => {
     if (value.tmdbId == null && value.imdbId == null) {
@@ -122,6 +123,13 @@ const submitMediaInputSchema = z
     segment: segmentTypeSchema,
     season: episodeSelectionSchema.optional(),
     episode: episodeSelectionSchema.optional(),
+    videoDurationMs: z
+      .number()
+      .int()
+      .min(0)
+      .max(MAX_TIMESTAMP_MS)
+      .nullable()
+      .optional(),
     startSec: z
       .number()
       .min(0)
@@ -147,12 +155,35 @@ const submitMediaInputSchema = z
           path: ['season'],
         });
       }
+      if (
+        value.videoDurationMs != null &&
+        (typeof value.season === 'string' || typeof value.episode === 'string')
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            '`videoDurationMs` is only supported for single TV episodes (season/episode must be numbers).',
+          path: ['videoDurationMs'],
+        });
+      }
     } else if (value.season != null || value.episode != null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
           '`season` and `episode` must be omitted when `type` is `movie`.',
         path: ['season'],
+      });
+    }
+
+    if (
+      value.videoDurationMs != null &&
+      value.videoDurationMs !== 0 &&
+      value.videoDurationMs < MIN_VIDEO_DURATION_MS
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `\`videoDurationMs\` must be 0 (unknown) or at least ${MIN_VIDEO_DURATION_MS}ms.`,
+        path: ['videoDurationMs'],
       });
     }
 
@@ -334,8 +365,8 @@ export function buildMediaQuery(params: GetMediaParams): URLSearchParams {
     query.set('episode', String(parsedParams.episode));
   }
 
-  if (parsedParams.details === true) {
-    query.set('details', 'true');
+  if (parsedParams.durationMs != null) {
+    query.set('duration_ms', String(parsedParams.durationMs));
   }
 
   return query;
@@ -367,6 +398,7 @@ export function serializeSubmissionRequest(
     segment: parsedInput.segment,
     season: parsedInput.season,
     episode: parsedInput.episode,
+    video_duration_ms: parsedInput.videoDurationMs ?? undefined,
     start_ms: normalizeRequestStart(parsedInput.segment, startMs),
     end_ms: normalizeRequestEnd(parsedInput.segment, endMs),
   };
@@ -399,8 +431,7 @@ export function parseSubmissionResponse(body: unknown): SubmissionResponse {
   );
 
   return {
-    ok: true,
-    submission: normalizeSubmissionData(parsed.submission),
+    submissions: parsed.submissions.map(normalizeSubmissionData),
   };
 }
 
@@ -448,6 +479,7 @@ function normalizeSubmissionData(
     segment: submission.segment,
     season: submission.season ?? undefined,
     episode: submission.episode ?? undefined,
+    videoDurationMs: submission.videoDurationMs ?? null,
     startMs,
     endMs,
     durationMs: endMs == null ? null : Math.max(endMs - startMs, 0),

@@ -138,6 +138,7 @@ export interface SubmissionDataRaw {
   season?: number | null;
   /** Episode number for TV submissions. */
   episode?: number | null;
+  videoDurationMs?: number | null;
   /** Start time in milliseconds. `null` means start of media for intro/recap. */
   startMs?: number | null;
   /** End time in milliseconds. `null` means end of media for credits/preview. */
@@ -164,6 +165,7 @@ export interface SubmissionData {
   season?: number;
   /** Episode number for TV submissions. */
   episode?: number;
+  videoDurationMs: number | null;
   /** Normalized start time in milliseconds. */
   startMs: number;
   /** End time in milliseconds, or `null` when the segment reaches media end. */
@@ -184,20 +186,14 @@ export interface SubmissionData {
  * Raw `/submit` success response.
  */
 export interface SubmissionResponseRaw {
-  /** Always `true` for successful submissions. */
-  ok: true;
-  /** The stored submission payload returned by the backend. */
-  submission: SubmissionDataRaw;
+  submissions: SubmissionDataRaw[];
 }
 
 /**
  * Normalized `/submit` success response exposed by this package.
  */
 export interface SubmissionResponse {
-  /** Always `true` for successful submissions. */
-  ok: true;
-  /** The normalized submission payload. */
-  submission: SubmissionData;
+  submissions: SubmissionData[];
 }
 
 /**
@@ -213,7 +209,7 @@ export interface GetMediaParams {
   season?: number;
   /** Episode number for TV episode lookups. */
   episode?: number;
-  details?: boolean;
+  durationMs?: number;
 }
 
 /**
@@ -234,6 +230,7 @@ export interface SubmitMediaBase {
   season?: EpisodeSelection;
   /** Episode selector for TV submissions. Omit for movies. */
   episode?: EpisodeSelection;
+  videoDurationMs?: number | null;
 }
 
 /**
@@ -285,6 +282,7 @@ export interface SubmissionRequestPayload {
   season?: EpisodeSelection;
   /** Episode selector for TV submissions. */
   episode?: EpisodeSelection;
+  video_duration_ms?: number | null;
   /** Start time in milliseconds, or `null` when the segment starts at the beginning. */
   start_ms?: number | null;
   /** End time in milliseconds, or `null` when the segment runs to media end. */
@@ -365,7 +363,7 @@ export interface TIDBLogger {
  * Shared TIDB transport options for standalone calls and client instances.
  */
 export interface TIDBTransportOptions {
-  /** Override for the API base URL. Defaults to the production v2 endpoint. */
+  /** Override for the API base URL. Defaults to the production v3 endpoint. */
   baseUrl?: string;
   /**
    * The current user's API key.

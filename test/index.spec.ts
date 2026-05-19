@@ -86,11 +86,11 @@ describe('TheIntroDB package', () => {
 
       await getMedia(
         { tmdbId: 12345 },
-        { fetch: fetchMock, baseUrl: 'http://api.theintrodb.org/v2' }
+        { fetch: fetchMock, baseUrl: 'http://api.theintrodb.org/v3' }
       );
 
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://api.theintrodb.org/v2/media?tmdb_id=12345',
+        'https://api.theintrodb.org/v3/media?tmdb_id=12345',
         expect.any(Object)
       );
     });
@@ -109,11 +109,11 @@ describe('TheIntroDB package', () => {
 
       await getMedia(
         { tmdbId: 12345 },
-        { fetch: fetchMock, baseUrl: 'api.theintrodb.org/v2' }
+        { fetch: fetchMock, baseUrl: 'api.theintrodb.org/v3' }
       );
 
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://api.theintrodb.org/v2/media?tmdb_id=12345',
+        'https://api.theintrodb.org/v3/media?tmdb_id=12345',
         expect.any(Object)
       );
     });
@@ -132,11 +132,11 @@ describe('TheIntroDB package', () => {
 
       await getMedia(
         { tmdbId: 12345 },
-        { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v2/' }
+        { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v3/' }
       );
 
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://api.theintrodb.org/v2/media?tmdb_id=12345',
+        'https://api.theintrodb.org/v3/media?tmdb_id=12345',
         expect.any(Object)
       );
     });
@@ -159,7 +159,7 @@ describe('TheIntroDB package', () => {
 
     const result = await getMedia(
       { tmdbId: 12345 },
-      { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v2' }
+      { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v3' }
     );
 
     expect(result.intro[0]).toEqual({
@@ -177,7 +177,7 @@ describe('TheIntroDB package', () => {
       endsAtMediaEnd: true,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.theintrodb.org/v2/media?tmdb_id=12345',
+      'https://api.theintrodb.org/v3/media?tmdb_id=12345',
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({ Accept: 'application/json' }),
@@ -185,27 +185,20 @@ describe('TheIntroDB package', () => {
     );
   });
 
-  it('includes confidence and submission counts when details=true is requested', async () => {
+  it('includes duration_ms when requested', async () => {
     const fetchMock = createFetchMock(
       createResponse({
         body: {
           tmdb_id: 12345,
           type: 'movie',
-          intro: [
-            {
-              start_ms: null,
-              end_ms: 90000,
-              confidence: 0.84,
-              submission_count: 12,
-            },
-          ],
+          intro: [{ start_ms: null, end_ms: 90000 }],
         },
       })
     );
 
     const result = await getMedia(
-      { tmdbId: 12345, details: true },
-      { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v2' }
+      { tmdbId: 12345, durationMs: 7200000 },
+      { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v3' }
     );
 
     expect(result.intro[0]).toEqual({
@@ -214,11 +207,9 @@ describe('TheIntroDB package', () => {
       durationMs: 90000,
       startsAtBeginning: true,
       endsAtMediaEnd: false,
-      confidence: 0.84,
-      submissionCount: 12,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.theintrodb.org/v2/media?tmdb_id=12345&details=true',
+      'https://api.theintrodb.org/v3/media?tmdb_id=12345&duration_ms=7200000',
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({ Accept: 'application/json' }),
@@ -257,7 +248,7 @@ describe('TheIntroDB package', () => {
 
     expect(result.preview[0].endMs).toBeNull();
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.theintrodb.org/v2/media?imdb_id=tt0111161&season=1&episode=2',
+      'https://api.theintrodb.org/v3/media?imdb_id=tt0111161&season=1&episode=2',
       expect.objectContaining({
         headers: expect.objectContaining({
           Accept: 'application/json',
@@ -288,6 +279,7 @@ describe('TheIntroDB package', () => {
       episode: undefined,
       imdb_id: undefined,
       tvdb_id: undefined,
+      video_duration_ms: undefined,
       start_ms: null,
       end_ms: 90000,
     });
@@ -308,6 +300,7 @@ describe('TheIntroDB package', () => {
       episode: undefined,
       imdb_id: undefined,
       tvdb_id: undefined,
+      video_duration_ms: undefined,
       start_ms: 1800000,
       end_ms: null,
     });
@@ -317,19 +310,21 @@ describe('TheIntroDB package', () => {
     const fetchMock = createFetchMock(
       createResponse({
         body: {
-          ok: true,
-          submission: {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            tmdbId: 67890,
-            type: 'tv',
-            segment: 'intro',
-            season: 1,
-            episode: 1,
-            startMs: null,
-            endMs: 85200,
-            status: 'accepted',
-            weight: 2,
-          },
+          submissions: [
+            {
+              id: '550e8400-e29b-41d4-a716-446655440001',
+              tmdbId: 67890,
+              type: 'tv',
+              segment: 'intro',
+              season: 1,
+              episode: 1,
+              videoDurationMs: 7200000,
+              startMs: null,
+              endMs: 85200,
+              status: 'accepted',
+              weight: 2,
+            },
+          ],
         },
       })
     );
@@ -342,14 +337,15 @@ describe('TheIntroDB package', () => {
         segment: 'intro',
         season: 1,
         episode: 1,
+        videoDurationMs: 7200000,
         startSec: null,
         endSec: 85.2,
       },
       { apiKey: 'submit-key', fetch: fetchMock, logger }
     );
 
-    expect(result.submission.startMs).toBe(0);
-    expect(result.submission.startsAtBeginning).toBe(true);
+    expect(result.submissions[0].startMs).toBe(0);
+    expect(result.submissions[0].startsAtBeginning).toBe(true);
     expect(fetchMock.mock.calls[0][1]?.body).toBe(
       JSON.stringify({
         tmdb_id: 67890,
@@ -357,6 +353,7 @@ describe('TheIntroDB package', () => {
         segment: 'intro',
         season: 1,
         episode: 1,
+        video_duration_ms: 7200000,
         start_ms: null,
         end_ms: 85200,
       })

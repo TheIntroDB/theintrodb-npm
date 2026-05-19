@@ -1,6 +1,6 @@
 {
   "name": "theintrodb",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "TypeScript client for retrieving and submitting intro, recap, credits, and preview timestamps from TheIntroDB API.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
