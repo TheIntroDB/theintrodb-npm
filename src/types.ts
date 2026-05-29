@@ -205,6 +205,8 @@ export interface GetMediaParams {
   tmdbId?: number;
   /** Optional IMDB identifier used when TMDB ID is unavailable. */
   imdbId?: string;
+  /** Optional TVDB identifier used when TMDB ID is unavailable. */
+  tvdbId?: number;
   /** Season number for TV episode lookups. */
   season?: number;
   /** Episode number for TV episode lookups. */
@@ -220,8 +222,6 @@ export interface SubmitMediaBase {
   tmdbId: number;
   /** Optional IMDB identifier sent through to the API. */
   imdbId?: string;
-  /** Optional TVDB identifier sent through to the API. */
-  tvdbId?: number;
   /** Media type for the submission. */
   type: MediaType;
   /** Segment type being submitted. */
@@ -272,8 +272,6 @@ export interface SubmissionRequestPayload {
   tmdb_id: number;
   /** Optional IMDB identifier used by the backend for linking. */
   imdb_id?: string;
-  /** Optional TVDB identifier. */
-  tvdb_id?: number;
   /** Media type for the submission. */
   type: MediaType;
   /** Segment type being submitted. */

@@ -425,6 +425,26 @@ describe('TheIntroDB package', () => {
       TheIntroDbValidationError
     );
 
+    // Provide season but missing episode
+    await expect(getMedia({ tmdbId: 12345, season: 1 })).rejects.toBeInstanceOf(
+      TheIntroDbValidationError
+    );
+
+    // Uses tvdbId successfully
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      text: () =>
+        Promise.resolve(JSON.stringify({ tmdb_id: 12345, type: 'tv' })),
+    });
+
+    await getMedia({ tvdbId: 54321 }, { fetch: mockFetch });
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('tvdb_id=54321'),
+      expect.any(Object)
+    );
+
     expect(() =>
       parseMediaResponse({
         tmdb_id: 12345,

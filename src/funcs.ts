@@ -89,15 +89,16 @@ const getMediaParamsSchema = z
   .object({
     tmdbId: z.number().int().min(1).max(MAX_TMDB_ID).optional(),
     imdbId: z.string().regex(IMDB_ID_PATTERN).optional(),
+    tvdbId: z.number().int().min(1).max(MAX_TMDB_ID).optional(),
     season: z.number().int().min(1).optional(),
     episode: z.number().int().min(1).optional(),
     durationMs: z.number().int().min(0).max(MAX_TIMESTAMP_MS).optional(),
   })
   .superRefine((value, ctx) => {
-    if (value.tmdbId == null && value.imdbId == null) {
+    if (value.tmdbId == null && value.imdbId == null && value.tvdbId == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Provide either `tmdbId` or `imdbId`.',
+        message: 'Provide either `tmdbId`, `imdbId`, or `tvdbId`.',
         path: ['tmdbId'],
       });
     }
@@ -118,7 +119,6 @@ const submitMediaInputSchema = z
   .object({
     tmdbId: z.number().int().min(1).max(MAX_TMDB_ID),
     imdbId: z.string().regex(IMDB_ID_PATTERN).optional(),
-    tvdbId: z.number().int().positive().optional(),
     type: mediaTypeSchema,
     segment: segmentTypeSchema,
     season: episodeSelectionSchema.optional(),
@@ -357,6 +357,10 @@ export function buildMediaQuery(params: GetMediaParams): URLSearchParams {
     query.set('imdb_id', parsedParams.imdbId);
   }
 
+  if (parsedParams.tvdbId != null) {
+    query.set('tvdb_id', String(parsedParams.tvdbId));
+  }
+
   if (parsedParams.season != null) {
     query.set('season', String(parsedParams.season));
   }
@@ -393,7 +397,6 @@ export function serializeSubmissionRequest(
   return {
     tmdb_id: parsedInput.tmdbId,
     imdb_id: parsedInput.imdbId,
-    tvdb_id: parsedInput.tvdbId,
     type: parsedInput.type,
     segment: parsedInput.segment,
     season: parsedInput.season,
