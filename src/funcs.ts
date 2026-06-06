@@ -314,7 +314,7 @@ export async function getMedia(
     'Invalid `getMedia` parameters.'
   );
   const transport = resolveTransport(transportOptions);
-  const query = buildMediaQuery(parsedParams);
+  const query = buildMediaQuery(parsedParams, true);
   const body = await requestJson(
     { method: 'GET', path: '/media', query, operationName: 'getMedia' },
     transport
@@ -341,12 +341,17 @@ export async function submitMediaTimestamp(
   return parseSubmissionResponse(body);
 }
 
-export function buildMediaQuery(params: GetMediaParams): URLSearchParams {
-  const parsedParams = parseWithSchema(
-    getMediaParamsSchema,
-    params,
-    'Invalid `getMedia` parameters.'
-  );
+export function buildMediaQuery(
+  params: GetMediaParams,
+  skipValidation = false
+): URLSearchParams {
+  const parsedParams = skipValidation
+    ? params
+    : parseWithSchema(
+        getMediaParamsSchema,
+        params,
+        'Invalid `getMedia` parameters.'
+      );
   const query = new URLSearchParams();
 
   if (parsedParams.tmdbId != null) {
