@@ -808,11 +808,7 @@ function flattenZodIssues(error: z.ZodError): string[] {
     } else if (pathLen === 1) {
       result[i] = `${path[0]}: ${issue.message}`;
     } else {
-      let pathStr = String(path[0]);
-      for (let j = 1; j < pathLen; j++) {
-        pathStr += `.${path[j]}`;
-      }
-      result[i] = `${pathStr}: ${issue.message}`;
+      result[i] = `${path.join('.')}: ${issue.message}`;
     }
   }
 
