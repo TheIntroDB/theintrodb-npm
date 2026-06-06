@@ -466,7 +466,8 @@ export function normalizeSegmentTimestamp(
 function normalizeSegmentCollection(
   timestamps: SegmentTimestampRaw[] | undefined
 ): NormalizedSegmentTimestamp[] {
-  return (timestamps ?? []).map(normalizeSegmentTimestamp);
+  if (!timestamps) return [];
+  return timestamps.map(normalizeSegmentTimestamp);
 }
 
 function normalizeSubmissionData(
