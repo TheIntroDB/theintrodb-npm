@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-template-expressions */
 import { z } from 'zod';
 
-import {
-  MEDIA_TYPES,
-  SEGMENT_TYPES,
-  SUBMISSION_STATUSES,
+import { MEDIA_TYPES, SEGMENT_TYPES, SUBMISSION_STATUSES } from './types';
+import type {
   FetchLike,
   GetMediaParams,
   HeadersLike,
@@ -457,11 +455,11 @@ export function normalizeSegmentTimestamp(
     endsAtMediaEnd: timestamp.end_ms == null,
   };
 
-  if (Object.prototype.hasOwnProperty.call(timestamp, 'confidence')) {
+  if ('confidence' in timestamp) {
     normalized.confidence = timestamp.confidence ?? null;
   }
 
-  if (Object.prototype.hasOwnProperty.call(timestamp, 'submission_count')) {
+  if ('submission_count' in timestamp) {
     normalized.submissionCount = timestamp.submission_count ?? null;
   }
 
@@ -505,7 +503,7 @@ function resolveTransport(
   return {
     baseUrl: sanitizeBaseUrl(transportOptions.baseUrl ?? DEFAULT_BASE_URL),
     apiKey: transportOptions.apiKey,
-    headers: { ...(transportOptions.headers ?? {}) },
+    headers: transportOptions.headers ? { ...transportOptions.headers } : {},
     fetch: transportOptions.fetch,
     logger: transportOptions.logger,
     signal: transportOptions.signal,
@@ -674,7 +672,11 @@ function parseJsonBody(bodyText: string): unknown {
   }
 }
 
+let _globalFetch: FetchLike | undefined;
+
 function getGlobalFetch(): FetchLike {
+  if (_globalFetch) return _globalFetch;
+
   const candidate = (globalThis as { fetch?: unknown }).fetch;
 
   if (typeof candidate !== 'function') {
@@ -683,14 +685,15 @@ function getGlobalFetch(): FetchLike {
     );
   }
 
-  return candidate as FetchLike;
+  _globalFetch = candidate as FetchLike;
+  return _globalFetch;
 }
 
 function sanitizeBaseUrl(baseUrl: string): string {
   let sanitized = baseUrl;
 
   if (sanitized.startsWith('http://')) {
-    sanitized = sanitized.replace('http://', 'https://');
+    sanitized = 'https://' + sanitized.slice(7);
   } else if (!sanitized.startsWith('https://')) {
     sanitized = `https://${sanitized}`;
   }
