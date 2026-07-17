@@ -1,6 +1,6 @@
 {
   "name": "theintrodb",
-  "version": "3.1.0",
+  "version": "3.1.2",
   "description": "TypeScript client for retrieving and submitting intro, recap, credits, and preview timestamps from TheIntroDB API.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -61,7 +61,7 @@
     "@semantic-release/npm": "^12.0.2",
     "@semantic-release/release-notes-generator": "^14.1.1",
     "@types/jest": "^27.5.2",
-    "@types/node": "^20.19.41",
+    "@types/node": "^20.19.43",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "conventional-changelog-conventionalcommits": "^5.0.0",
@@ -73,7 +73,7 @@
     "jest": "^27.5.1",
     "lint-staged": "^13.3.0",
     "prettier": "^2.8.8",
-    "semantic-release": "^25.0.3",
+    "semantic-release": "^25.0.7",
     "ts-jest": "^27.1.5",
     "typescript": "^4.9.5",
     "undici": "^7.28.0"
