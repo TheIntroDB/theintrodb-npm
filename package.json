@@ -25,7 +25,9 @@
     "access": "public"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "AGENTS.md",
+    "docs/**/*"
   ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",

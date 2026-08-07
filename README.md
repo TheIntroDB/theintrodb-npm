@@ -15,6 +15,22 @@ Detailed documentation can be found at: https://theintrodb.github.io/theintrodb-
 npm install theintrodb
 ```
 
+## Setting Up With An AI Coding Agent
+
+If you are using an AI coding agent (Claude Code, opencode, Codex, Cursor,
+Copilot, etc.), the package bundles version-matched agent docs. Paste the
+following prompt and let the agent handle the setup:
+
+> Install `theintrodb` in this project with `pnpm add theintrodb` (do not use
+> `pnpm install theintrodb`). Then read `node_modules/theintrodb/AGENTS.md` and
+> `node_modules/theintrodb/docs/getting-started.md` and set up a typed
+> TheIntroDB client in this codebase according to those docs.
+
+The bundled `AGENTS.md` and `docs/` folder always match the installed version,
+so the agent never works from stale or generic knowledge. Types are declared in
+`node_modules/theintrodb/lib/index.d.ts` and
+`node_modules/theintrodb/lib/types.d.ts`.
+
 ## Features
 
 - Centralized request, parsing, and validation logic
