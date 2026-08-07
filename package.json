@@ -75,10 +75,10 @@
     "jest": "^27.5.1",
     "lint-staged": "^13.3.0",
     "prettier": "^2.8.8",
-    "semantic-release": "^25.0.7",
+    "semantic-release": "^25.0.9",
     "ts-jest": "^27.1.5",
     "typescript": "^4.9.5",
-    "undici": "^7.28.0"
+    "undici": "^7.29.0"
   },
   "config": {
     "commitizen": {
