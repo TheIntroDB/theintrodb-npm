@@ -1,7 +1,4 @@
 export {
-  TheIntroDbApiError,
-  TheIntroDbResponseValidationError,
-  TheIntroDbValidationError,
   buildMediaQuery,
   createIntroDbClient,
   getMedia,
@@ -10,6 +7,9 @@ export {
   parseSubmissionResponse,
   serializeSubmissionRequest,
   submitMediaTimestamp,
+  TheIntroDbApiError,
+  TheIntroDbResponseValidationError,
+  TheIntroDbValidationError,
 } from './funcs';
 
 export type {

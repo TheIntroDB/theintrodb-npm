@@ -32,8 +32,8 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "clean": "rm -rf ./lib/",
-    "lint": "eslint ./src/ --fix",
-    "prepare": "husky install",
+    "lint": "biome check --write ./src ./test",
+    "prepare": "husky",
     "semantic-release": "semantic-release",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
@@ -56,29 +56,23 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.13",
     "@ryansonshine/commitizen": "^4.2.8",
     "@ryansonshine/cz-conventional-changelog": "^3.3.4",
     "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/github": "^11.0.6",
-    "@semantic-release/npm": "^12.0.2",
+    "@semantic-release/github": "^12.0.9",
+    "@semantic-release/npm": "^13.1.5",
     "@semantic-release/release-notes-generator": "^14.1.1",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^20.19.43",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "conventional-changelog-conventionalcommits": "^5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.10.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.4.1",
-    "husky": "^6.0.0",
-    "jest": "^27.5.1",
-    "lint-staged": "^13.3.0",
-    "prettier": "^2.8.8",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.6.0",
+    "conventional-changelog-conventionalcommits": "^10.4.0",
+    "husky": "^9.1.7",
+    "jest": "^30.5.1",
+    "lint-staged": "^17.5.1",
     "semantic-release": "^25.0.9",
-    "ts-jest": "^27.1.5",
-    "typescript": "^4.9.5",
-    "undici": "^7.29.1"
+    "ts-jest": "^29.4.12",
+    "typescript": "^6.0.3",
+    "undici": "^8.10.2"
   },
   "config": {
     "commitizen": {
@@ -86,7 +80,7 @@
     }
   },
   "lint-staged": {
-    "*.ts": "eslint --cache --cache-location .eslintcache --fix"
+    "*.{ts,js,json}": "biome check --write"
   },
   "release": {
     "branches": [

@@ -1,15 +1,15 @@
 import {
-  TheIntroDbApiError,
-  TheIntroDbResponseValidationError,
-  TheIntroDbValidationError,
   createIntroDbClient,
   getMedia,
   normalizeSegmentTimestamp,
   parseMediaResponse,
   serializeSubmissionRequest,
   submitMediaTimestamp,
+  type TheIntroDbApiError,
+  TheIntroDbResponseValidationError,
+  TheIntroDbValidationError,
 } from '../src';
-import {
+import type {
   FetchLike,
   FetchResponseLike,
   HeadersLike,

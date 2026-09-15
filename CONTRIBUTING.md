@@ -20,7 +20,7 @@ pnpm install
 pnpm build       # compile TypeScript into lib/
 pnpm test        # run the Jest suite with coverage
 pnpm test:watch  # run Jest in watch mode
-pnpm lint        # ESLint with --fix over src/
+pnpm lint        # Biome check with --write over src/ and test/
 pnpm typecheck   # tsc --noEmit
 pnpm clean       # remove the lib/ build output
 ```
