@@ -5,6 +5,7 @@
 - [Functions](functions.md)
 - [Types](types.md)
 - [Errors And Validation](errors.md)
+- [Migrating v3 To v4](migration-v3-to-v4.md)
 
 # Types
 
@@ -34,6 +35,39 @@ Readonly array of submission states:
 - `'accepted'`
 - `'rejected'`
 
+### EPISODE_ORDERS
+
+Readonly array of canonical TVDB episode orders accepted as a `mapping`:
+
+- `'default'`
+- `'official'`
+- `'dvd'`
+- `'alternate'`
+- `'absolute'`
+- `'regional'`
+
+### EPISODE_ORDER_ALIASES
+
+Record mapping every accepted `mapping` spelling to its canonical
+`EpisodeOrder`. It mirrors the API's alias set, so the same spellings the server
+accepts are accepted (and canonicalised) by the package before a request is sent.
+Besides the six canonical names it carries:
+
+- `'defaultorder'`
+- `'officialorder'`, `'aired'`, `'airedorder'`
+- `'altdvd'`, `'dvdorder'`
+- `'absoluteorder'`, `'abso'`
+- `'alternateorder'`, `'alttwo'`, `'streaming'`, `'streamingorder'`
+- `'regionalorder'`, `'production'`, `'productionorder'`
+
+### MEDIA_RESPONSE_KINDS
+
+Readonly array of `GET /media` response discriminants:
+
+- `'media'`
+- `'versions'`
+- `'episodes'`
+
 ## Core Client Types
 
 ### TIDBClient
@@ -43,6 +77,7 @@ Returned by `createIntroDbClient()`.
 Methods:
 
 - `getMedia(params, requestOptions?)`
+- `mapSubmission(input, requestOptions?)`
 - `submitMediaTimestamp(input, requestOptions?)`
 
 ### TIDBClientOptions
@@ -118,24 +153,48 @@ Union of:
 - `'accepted'`
 - `'rejected'`
 
+### EpisodeOrder
+
+Union of the six canonical TVDB orders. See `EPISODE_ORDERS`.
+
+### EpisodeOrderInput
+
+`EpisodeOrder | string`: a canonical order name or any accepted alias. Aliases
+are canonicalised by the package before a request is sent.
+
+### EpisodeSelection
+
+`number | string`. The string form may be a single number (`'1'`), a
+comma-separated list (`'1,2'`), an ascending range (`'1-3'`), or a mix
+(`'1,3-4,6'`).
+
 ## Request Types
 
 ### GetMediaParams
 
 Fields:
 
+- `tvdbId?`
 - `tmdbId?`
 - `imdbId?`
 - `season?`
 - `episode?`
+- `mapping?`
+- `tvdbEpisodeId?`
+- `episodeName?`
+- `episodeTitle?`
 - `durationMs?`
+- `listVersions?`
+- `mergeUnknown?`
+- `details?`
 
 Notes:
 
-- provide `tmdbId` for movies
-- provide `tmdbId`, `season`, and `episode` for TV episodes
-- `imdbId` is supported when TMDB is not available
+- provide exactly one identity: `tvdbId` (preferred), `tmdbId` or `imdbId`
+- provide `season` and `episode` together for TV episodes; omit both for movies
 - `durationMs` is optional but very highly recommended; it helps the API select the closest matching release version (theatrical, extended cut, DVD release, etc.)
+- `mapping` is only meaningful for TV; omit it for movies
+- `mergeUnknown` is left to the API default (`true`) unless you set it
 
 ### SubmitMediaBase
 
@@ -143,13 +202,17 @@ Shared base fields for submission inputs.
 
 Fields:
 
-- `tmdbId`
-- `imdbId?`
 - `tvdbId?`
+- `tmdbId?`
+- `imdbId?`
 - `type`
 - `segment`
 - `season?`
 - `episode?`
+- `mapping?`
+- `tvdbEpisodeId?`
+- `episodeName?`
+- `episodeTitle?`
 - `videoDurationMs?`
 
 ### SubmitMediaSecondsInput
@@ -183,16 +246,37 @@ Serialized raw payload sent to `/submit`.
 
 Fields:
 
-- `tmdb_id`
-- `imdb_id?`
-- `tvdb_id?`
 - `type`
 - `segment`
+- `tvdb_id?`
+- `tmdb_id?`
+- `imdb_id?`
 - `season?`
 - `episode?`
+- `mapping?`
+- `tvdb_episode_id?`
+- `episode_name?`
+- `episode_title?`
 - `video_duration_ms?`
 - `start_ms?`
 - `end_ms?`
+
+### MapSubmissionInput
+
+Parameters accepted by `mapSubmission()`.
+
+Fields:
+
+- `type`
+- `tvdbId?`
+- `tmdbId?`
+- `imdbId?`
+- `season?`
+- `episode?`
+- `mapping?`
+- `tvdbEpisodeId?`
+- `episodeName?`
+- `episodeTitle?`
 
 ## Response Types
 
@@ -218,6 +302,8 @@ Fields:
 
 - `start_ms`
 - `end_ms`
+- `confidence?` (only present when `details=true`)
+- `submission_count?` (only present when `details=true`)
 
 Notes:
 
@@ -236,27 +322,48 @@ Fields:
 - `durationMs`
 - `startsAtBeginning`
 - `endsAtMediaEnd`
+- `confidence?`
+- `submissionCount?`
 
 Notes:
 
 - `startMs` is always a number
 - when the raw API used `start_ms: null`, this package returns `startMs: 0`
 - `endMs` remains `null` when the raw API means "to the end of media"
+- `confidence` and `submissionCount` are only present when `details=true` was requested
 
 ### MediaResponseRaw
 
-Raw `/media` response.
+Raw grouped-timestamps `/media` response.
+
+### MediaVersionRaw / MediaVersion
+
+A release version (a duration cluster) in raw and normalized form.
+
+### MediaVersionsRaw / MediaVersions
+
+The `list_versions=true` response in raw and normalized form.
+
+### MediaEpisodeSummaryRaw / MediaEpisodeSummary
+
+Per-episode submission counts in raw and normalized form.
+
+### MediaEpisodeListRaw / MediaEpisodeList
+
+The episode-list fallback response in raw and normalized form.
 
 ### MediaRecord
 
-Normalized media result returned by the package.
+Normalized grouped-timestamps media result (`kind: 'media'`).
 
 Fields:
 
-- `tmdbId`
+- `kind` (always `'media'`)
+- `tvdbId`
 - `type`
 - `season?`
 - `episode?`
+- `groupDurationMs` (only non-null when `details=true`)
 - `intro`
 - `recap`
 - `credits`
@@ -267,6 +374,34 @@ Notes:
 - `intro`, `recap`, `credits`, and `preview` are always arrays (this package normalizes missing segment properties to `[]`)
 - a segment array may contain multiple entries for the same segment type (for example, some episodes have multiple recaps); this is expected and is not an error
 
+### MediaVersions
+
+Normalized release-version list (`kind: 'versions'`).
+
+Fields:
+
+- `kind` (always `'versions'`)
+- `tvdbId`
+- `type`
+- `season?`
+- `episode?`
+- `versions` (array of `MediaVersion`)
+
+### MediaEpisodeList
+
+Normalized episode-list fallback (`kind: 'episodes'`).
+
+Fields:
+
+- `kind` (always `'episodes'`)
+- `tvdbId`
+- `type`
+- `episodes` (array of `MediaEpisodeSummary`)
+
+### MediaResponse
+
+`MediaRecord | MediaVersions | MediaEpisodeList`. Narrow it with `kind`.
+
 ### SubmissionDataRaw
 
 Raw submission object from the API.
@@ -274,6 +409,7 @@ Raw submission object from the API.
 Notes:
 
 - returned by successful `POST /submit` responses
+- the identity field is `tvdbId` (camelCase) and may be `null` only in a response that predates the field
 - uses camelCase field names from the backend response: `startMs` and `endMs`
 - `startMs: null` can appear for intro/recap submissions that begin at the start
 - `endMs: null` can appear for credits/preview submissions that go to the end
@@ -286,7 +422,7 @@ Normalized submission object returned by the package.
 Fields:
 
 - `id`
-- `tmdbId`
+- `tvdbId` (`number | null`)
 - `type`
 - `segment`
 - `season?`
@@ -306,27 +442,40 @@ Notes:
 - converts `startMs: null` to `startMs: 0`
 - adds `durationMs`, `startsAtBeginning`, and `endsAtMediaEnd`
 
-### SubmissionResponseRaw
+### SubmissionResponseRaw / SubmissionResponse
 
-Raw success response from `/submit`.
-
-Fields:
-
-- `submissions`
-
-### SubmissionResponse
-
-Normalized success response returned by the package.
+Raw and normalized success response from `/submit`.
 
 Fields:
 
+- `ok` (always `true` on a `200`)
 - `submissions`
+
+### MapResponseRaw / MapResult
+
+Raw and normalized success response from `/map`.
+
+Fields:
+
+- `tvdbId`
+- `type`
+- `mapping` (the order the caller's numbers were read in, canonicalised)
+- `mediaTitle?`
+- `season?`
+- `episode?`
+- `tvdbEpisodeId?`
+- `episodeTitle?`
 
 ## Utility Types
 
 ### RateLimitDetails
 
-Parsed rate-limit and usage-limit metadata.
+Parsed rate-limit and usage-limit metadata, including the specific-media usage
+cap:
+
+- `rateLimit`, `rateLimitRemaining`, `rateLimitResetSeconds`
+- `usageLimit`, `usageRemaining`, `usageResetSeconds`
+- `specificMediaLimit`, `specificMediaRemaining`, `specificMediaResetSeconds`
 
 ### ErrorResponse
 
