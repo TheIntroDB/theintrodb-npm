@@ -164,6 +164,17 @@ const errorResponseSchema = z.object({
   retry_after: z.string().optional(),
 });
 
+// Prototype-free mirror of the alias table, used for lookups.
+//
+// EPISODE_ORDER_ALIASES is a plain object literal, so a bare lookup would also
+// resolve inherited Object.prototype members: "constructor" (and any other
+// inherited name) would come back as a function and be accepted as a valid
+// order. A null-prototype copy makes a bare lookup own-property-only.
+const EPISODE_ORDER_LOOKUP: Record<string, EpisodeOrder> = Object.assign(
+  Object.create(null) as Record<string, EpisodeOrder>,
+  EPISODE_ORDER_ALIASES
+);
+
 /**
  * Resolves a `mapping` spelling to its canonical TVDB episode order.
  *
@@ -176,7 +187,8 @@ export function normalizeEpisodeOrder(name: string): EpisodeOrder | undefined {
     .trim()
     .toLowerCase()
     .replace(/[\s_-]/g, '');
-  return EPISODE_ORDER_ALIASES[key] ?? undefined;
+
+  return EPISODE_ORDER_LOOKUP[key];
 }
 
 function validateEpisodeOrder(
@@ -229,7 +241,7 @@ const getMediaParamsSchema = z
     if (hasNoMediaIdentity(value)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Provide one of `tvdbId`, `tmdbId`, or `imdbId`.',
+        message: 'Provide at least one of `tvdbId`, `tmdbId`, or `imdbId`.',
         path: ['tvdbId'],
       });
     }
@@ -291,7 +303,7 @@ const submitMediaInputSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          'Provide one of `tvdbId`, `tmdbId`, or `imdbId` as the media identifier.',
+          'Provide at least one of `tvdbId`, `tmdbId`, or `imdbId` as the media identifier.',
         path: ['tvdbId'],
       });
     }
@@ -408,7 +420,7 @@ const mapSubmissionInputSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          'Provide one of `tvdbId`, `tmdbId`, or `imdbId` as the media identifier.',
+          'Provide at least one of `tvdbId`, `tmdbId`, or `imdbId` as the media identifier.',
         path: ['tvdbId'],
       });
     }

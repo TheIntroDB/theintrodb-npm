@@ -46,7 +46,7 @@ const client = createIntroDbClient({
 
 ## Identity
 
-TVDB is the identity in v4. Address a media with exactly one of `tvdbId`, `tmdbId` or `imdbId`, preferring `tvdbId`: the other two are resolved server-side and are slower.
+TVDB is the identity in v4. Address a media with at least one of `tvdbId`, `tmdbId` or `imdbId`, preferring `tvdbId`: the other two are resolved server-side and are slower. Supplying more than one is allowed; the API applies the priority order `tvdbId` -> `tmdbId` -> `imdbId`.
 
 ## Read Media Data
 

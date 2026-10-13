@@ -162,6 +162,28 @@ describe('TheIntroDB package', () => {
       expect(normalizeEpisodeOrder('productionorder')).toBe('regional');
       expect(normalizeEpisodeOrder('bogus')).toBeUndefined();
     });
+
+    it('ignores inherited object properties', () => {
+      expect(normalizeEpisodeOrder('constructor')).toBeUndefined();
+      expect(normalizeEpisodeOrder('__proto__')).toBeUndefined();
+      expect(normalizeEpisodeOrder('hasOwnProperty')).toBeUndefined();
+      expect(normalizeEpisodeOrder('toString')).toBeUndefined();
+    });
+
+    it('rejects an inherited property name as a mapping', () => {
+      expect(() =>
+        serializeSubmissionRequest({
+          tvdbId: 169,
+          type: 'tv',
+          segment: 'intro',
+          season: 1,
+          episode: 1,
+          mapping: 'constructor',
+          startSec: 0,
+          endSec: 90,
+        })
+      ).toThrow(TheIntroDbValidationError);
+    });
   });
 
   describe('getMedia', () => {
@@ -419,6 +441,26 @@ describe('TheIntroDB package', () => {
       expect(query.toString()).toBe(
         'tvdb_id=71663&season=1&episode=1&mapping=alternate'
       );
+    });
+
+    it('forwards more than one identity for the API to prioritise', () => {
+      // The API accepts several ids and resolves them in the priority order
+      // tvdb_id -> tmdb_id -> imdb_id, so the package forwards all of them
+      // rather than rejecting the request.
+      expect(buildMediaQuery({ tvdbId: 169, tmdbId: 278 }).toString()).toBe(
+        'tvdb_id=169&tmdb_id=278'
+      );
+
+      expect(
+        serializeSubmissionRequest({
+          tvdbId: 169,
+          tmdbId: 278,
+          type: 'movie',
+          segment: 'intro',
+          startSec: 0,
+          endSec: 90,
+        })
+      ).toMatchObject({ tvdb_id: 169, tmdb_id: 278 });
     });
 
     it('sends merge_unknown only when explicitly set', () => {

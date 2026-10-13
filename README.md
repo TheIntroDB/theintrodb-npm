@@ -126,7 +126,7 @@ const mapping = await client.mapSubmission(
 
 - TVDB is the identity in v4: prefer `tvdbId`
 - `tmdbId` and `imdbId` are accepted as alternate ways to address a media and are resolved server-side (slower)
-- Provide exactly one identity per request
+- Provide at least one identity per request; the API resolves them in the priority order `tvdbId` -> `tmdbId` -> `imdbId`
 
 ### Get Media Timestamps
 

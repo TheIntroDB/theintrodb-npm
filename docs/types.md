@@ -190,7 +190,7 @@ Fields:
 
 Notes:
 
-- provide exactly one identity: `tvdbId` (preferred), `tmdbId` or `imdbId`
+- provide at least one identity: `tvdbId` (preferred), `tmdbId` or `imdbId`. Supplying more than one is allowed; the API applies the priority order `tvdbId` -> `tmdbId` -> `imdbId`
 - provide `season` and `episode` together for TV episodes; omit both for movies
 - `durationMs` is optional but very highly recommended; it helps the API select the closest matching release version (theatrical, extended cut, DVD release, etc.)
 - `mapping` is only meaningful for TV; omit it for movies

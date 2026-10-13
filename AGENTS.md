@@ -41,9 +41,10 @@ Client options:
 
 ## Identity
 
-TVDB is the identity in v4. Address a media with exactly one of `tvdbId`,
+TVDB is the identity in v4. Address a media with at least one of `tvdbId`,
 `tmdbId` or `imdbId`, and prefer `tvdbId`: the other two are resolved
-server-side and are slower.
+server-side and are slower. When more than one is supplied the API applies the
+priority order `tvdbId` -> `tmdbId` -> `imdbId`.
 
 ```ts
 const media = await client.getMedia({ tvdbId: 71663, season: 1, episode: 1 });

@@ -347,7 +347,8 @@ export type MediaResponse = MediaRecord | MediaVersions | MediaEpisodeList;
  *
  * TVDB is the identity in v4, so `tvdbId` is preferred; `tmdbId` and `imdbId`
  * are accepted as alternate ways to address the media and are resolved
- * server-side. Address the media with exactly one of the three.
+ * server-side. Address the media with at least one of the three; the API resolves
+ * them in the priority order `tvdbId` -> `tmdbId` -> `imdbId`.
  */
 export interface GetMediaParams {
   /** Preferred canonical identifier for the media item. */
