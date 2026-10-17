@@ -5,7 +5,7 @@
 [![Downloads][downloads-img]][downloads-url]
 [![Code Coverage][codecov-img]][codecov-url]
 
-Typed TypeScript client package for the TheIntroDB API.
+Typed TypeScript client package for the TheIntroDB API (v4).
 
 Detailed documentation can be found at: https://theintrodb.github.io/theintrodb-npm/
 
@@ -36,7 +36,9 @@ so the agent never works from stale or generic knowledge. Types are declared in
 - Centralized request, parsing, and validation logic
 - Runtime validation of request payloads and API responses
 - `GET /media` works without auth and can optionally use a current user API key
-- `POST /submit` requires the current user's API key so submissions go to that account
+- `POST /submit` and `POST /map` require the current user's API key so requests act on that account
+- TVDB-primary identity: address a media with `tvdbId` (preferred), `tmdbId` or `imdbId`
+- Episode-order `mapping` support (`default`, `official`, `dvd`, `alternate`, `absolute`, `regional`, plus Jellyfin aliases)
 - Normalized timestamp handling keeps `null` end times as "end of media" and converts `null` starts to `0`
 - Reusable client or standalone function usage
 - Optional logging hooks for auth-sensitive request flows
@@ -53,23 +55,28 @@ const client = createIntroDbClient({
   logger: console,
 });
 
-// Public movie lookup: no API key required.
+// Public movie lookup: no API key required. TVDB is the identity.
 const publicMedia = await client.getMedia({
-  tmdbId: 12345,
+  tvdbId: 169,
 });
 
 // Public TV lookup: include `season` and `episode` for a specific episode.
 const publicEpisodeMedia = await client.getMedia({
-  tmdbId: 67890,
+  tvdbId: 71663,
   season: 1,
   episode: 1,
 });
+
+// `getMedia()` returns a discriminated union; narrow it with `kind`.
+if (publicEpisodeMedia.kind === 'media') {
+  console.log(publicEpisodeMedia.intro[0]?.startMs);
+}
 
 // Optional current-user API key:
 // this can include that user's still-pending submissions in the response.
 const mediaWithMyPendingSubmissions = await client.getMedia(
   {
-    tmdbId: 12345,
+    tvdbId: 169,
   },
   {
     apiKey: currentUserApiKey,
@@ -80,11 +87,25 @@ const mediaWithMyPendingSubmissions = await client.getMedia(
 // The key should belong to the end user so the submission is attached to their account.
 const submission = await client.submitMediaTimestamp(
   {
-    tmdbId: 12345,
+    tvdbId: 169,
     type: 'movie',
     segment: 'intro',
     startSec: 0,
     endSec: 90,
+  },
+  {
+    apiKey: currentUserApiKey,
+  }
+);
+
+// Preview where a submission would land before storing it.
+const mapping = await client.mapSubmission(
+  {
+    tvdbId: 71663,
+    type: 'tv',
+    mapping: 'dvd',
+    season: '1',
+    episode: '1',
   },
   {
     apiKey: currentUserApiKey,
@@ -96,16 +117,27 @@ const submission = await client.submitMediaTimestamp(
 
 - `getMedia()` does not require authentication
 - `getMedia()` optionally accepts the current user's API key; when provided, the API may include that user's pending submissions in the weighted result
-- `submitMediaTimestamp()` always requires the current user's API key
+- `submitMediaTimestamp()` and `mapSubmission()` always require the current user's API key
 - Do not ship a shared application API key; this package is designed for end-user keys
 
 ## API Notes
 
+### Identity
+
+- TVDB is the identity in v4: prefer `tvdbId`
+- `tmdbId` and `imdbId` are accepted as alternate ways to address a media and are resolved server-side (slower)
+- Provide at least one identity per request; the API resolves them in the priority order `tvdbId` -> `tmdbId` -> `imdbId`
+
 ### Get Media Timestamps
 
-- Use `tmdbId` for movies
-- Use `tmdbId`, `season`, and `episode` for TV episodes
-- `imdbId` is supported but `tmdbId` remains the preferred canonical identifier
+- Returns one of three shapes, discriminated by `kind`:
+  - `'media'`: the grouped skip timestamps (`MediaRecord`)
+  - `'versions'`: the release-version list, when `listVersions: true`
+  - `'episodes'`: a per-episode submission-count fallback
+- Use `tvdbId` for movies
+- Use `tvdbId`, `season`, and `episode` for TV episodes
+- `mapping` states the episode order your `season`/`episode` are given in; omitted means `default`
+- `details: true` adds `confidence`/`submissionCount` per segment and `groupDurationMs` to the body
 - Segment arrays are omitted by the API when no submissions exist for that segment type
 - Segment arrays can contain multiple entries for the same segment type (for example, some episodes have multiple recaps); this is expected and should be handled by using all available segments
 
@@ -115,6 +147,7 @@ const submission = await client.submitMediaTimestamp(
 - Use either `startSec`/`endSec` or `startMs`/`endMs`, never both
 - `intro` and `recap` allow `null` starts
 - `credits` and `preview` allow `null` ends, which mean "to the end of media"
+- For TV, `season`/`episode` may be a single value or a list/range string (`'1,2'`, `'1-3'`, `'1,3-4,6'`)
 
 ## Timestamp Semantics
 
@@ -154,6 +187,8 @@ Example raw API response fragment:
 
 ```json
 {
+  "tvdb_id": 169,
+  "type": "movie",
   "intro": [
     {
       "start_ms": null,
@@ -173,6 +208,10 @@ Normalized package result:
 
 ```ts
 {
+  kind: 'media',
+  tvdbId: 169,
+  type: 'movie',
+  groupDurationMs: null,
   intro: [
     {
       startMs: 0,
@@ -206,7 +245,7 @@ The package converts second-based inputs into millisecond request values before 
 ```ts
 await client.submitMediaTimestamp(
   {
-    tmdbId: 12345,
+    tvdbId: 71663,
     type: 'tv',
     season: 1,
     episode: 1,
@@ -222,7 +261,7 @@ await client.submitMediaTimestamp(
 
 ## Important
 
-- User API keys are optional for reads and required for submissions
+- User API keys are optional for reads and required for submissions and mapping
 - When a user supplies their API key to `getMedia()`, they can see pending submissions tied to their own account
 - This package validates payloads locally before making requests and validates JSON responses after receiving them
 
