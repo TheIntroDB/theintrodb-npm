@@ -1,9 +1,17 @@
-# TheIntroDB NPM Package
+<img align="right" width="88" src="https://raw.githubusercontent.com/TheIntroDB/theintrodb-assets/main/integrations/npm.png" alt="npm">
 
-[![npm package][npm-img]][npm-url]
-[![Build Status][build-img]][build-url]
-[![Downloads][downloads-img]][downloads-url]
-[![Code Coverage][codecov-img]][codecov-url]
+[![npm](https://img.shields.io/npm/v/theintrodb?style=flat-square&logo=npm&logoColor=4ade80&label=npm&labelColor=0d0d0d&color=038939)](https://www.npmjs.com/package/theintrodb)
+[![Downloads](https://img.shields.io/npm/dt/theintrodb?style=flat-square&logo=npm&logoColor=4ade80&label=Downloads&labelColor=0d0d0d&color=038939)](https://www.npmjs.com/package/theintrodb)
+[![License](https://img.shields.io/github/license/TheIntroDB/theintrodb-npm?style=flat-square&logo=gnu&logoColor=4ade80&label=License&labelColor=0d0d0d&color=038939)](https://github.com/TheIntroDB/theintrodb-npm/blob/main/LICENSE)
+
+[![Stars](https://img.shields.io/github/stars/TheIntroDB/theintrodb-npm?style=flat-square&logo=github&logoColor=4ade80&label=Stars&labelColor=0d0d0d&color=038939)](https://github.com/TheIntroDB/theintrodb-npm/stargazers)
+[![Issues](https://img.shields.io/github/issues/TheIntroDB/theintrodb-npm?style=flat-square&logo=github&logoColor=4ade80&label=Issues&labelColor=0d0d0d&color=038939)](https://github.com/TheIntroDB/theintrodb-npm/issues)
+[![Last commit](https://img.shields.io/github/last-commit/TheIntroDB/theintrodb-npm?style=flat-square&logo=git&logoColor=4ade80&label=Last%20commit&labelColor=0d0d0d&color=038939)](https://github.com/TheIntroDB/theintrodb-npm/commits)
+[![Discord](https://img.shields.io/discord/1457550295742812307?style=flat-square&logo=discord&logoColor=4ade80&label=Discord&labelColor=0d0d0d&color=038939)](https://discord.com/channels/1457550295742812307/1457550298255200380)
+
+### TheIntroDB – NPM Package
+
+---
 
 Typed TypeScript client package for the TheIntroDB API (v4).
 
@@ -272,11 +280,11 @@ npm run build
 npm test
 ```
 
-[build-img]:https://github.com/theintrodb/theintrodb/actions/workflows/release.yml/badge.svg
-[build-url]:https://github.com/theintrodb/theintrodb/actions/workflows/release.yml
-[downloads-img]:https://img.shields.io/npm/dt/theintrodb
-[downloads-url]:https://www.npmtrends.com/theintrodb
-[npm-img]:https://img.shields.io/npm/v/theintrodb
-[npm-url]:https://www.npmjs.com/package/theintrodb
-[codecov-img]:https://codecov.io/gh/theintrodb/theintrodb/branch/main/graph/badge.svg
-[codecov-url]:https://codecov.io/gh/theintrodb/theintrodb
+---
+
+<p align="center">
+  <a href="https://theintrodb.org"><img src="https://raw.githubusercontent.com/TheIntroDB/theintrodb-assets/main/badge.png" alt="TheIntroDB" width="44" height="44"></a>
+  <br><br>
+  <sub><b>TheIntroDB</b> · community-submitted intro, recap, credits and preview timestamps for your media server<br>
+  <a href="https://theintrodb.org">theintrodb.org</a> · <a href="https://github.com/TheIntroDB">GitHub</a> · <a href="https://discord.com/channels/1457550295742812307/1457550298255200380">Discord</a></sub>
+</p>
