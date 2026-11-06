@@ -1,4 +1,4 @@
-<img align="right" width="88" src="https://raw.githubusercontent.com/TheIntroDB/theintrodb-assets/main/integrations/npm.png" alt="npm">
+<img align="right" width="88" src="https://raw.githubusercontent.com/TheIntroDB/.github/main/integrations/npm.png" alt="npm">
 
 [![npm](https://img.shields.io/npm/v/theintrodb?style=flat-square&logo=npm&logoColor=4ade80&label=npm&labelColor=0d0d0d&color=038939)](https://www.npmjs.com/package/theintrodb)
 [![Downloads](https://img.shields.io/npm/dt/theintrodb?style=flat-square&logo=npm&logoColor=4ade80&label=Downloads&labelColor=0d0d0d&color=038939)](https://www.npmjs.com/package/theintrodb)
