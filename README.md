@@ -280,7 +280,13 @@ npm run build
 npm test
 ```
 
+## License
+
+**MIT License** (`MIT`) — see [LICENSE](LICENSE) for the full text. Every source file carries `SPDX-License-Identifier: MIT`.
+
 ---
+
+--
 
 <p align="center">
   <a href="https://theintrodb.org"><img src="https://raw.githubusercontent.com/TheIntroDB/theintrodb-assets/main/badge.png" alt="TheIntroDB" width="44" height="44"></a>

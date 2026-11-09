@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (C) 2026 TheIntroDB
+
 /**
  * The media kinds supported by TheIntroDB.
  */

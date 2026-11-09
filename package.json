@@ -20,7 +20,7 @@
     "url": "https://github.com/theintrodb/theintrodb-npm/issues"
   },
   "homepage": "https://theintrodb.org",
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   },

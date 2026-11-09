@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (C) 2026 TheIntroDB
+
 module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/test/**/*.spec.ts'],
